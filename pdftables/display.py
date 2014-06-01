@@ -25,7 +25,7 @@ def to_string(table):
 
     result.write(hbar)
     for row_index, row in enumerate(table):
-        cells = [cell.rjust(width, ' ') for (cell, width)
+        cells = [cell.replace('\n', '').rjust(width, ' ') for (cell, width)
                  in zip(row, col_widths)]
         result.write("{:>3} | {}|\n".format(row_index, '|'.join(cells)))
     result.write(hbar)
