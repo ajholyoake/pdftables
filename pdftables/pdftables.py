@@ -480,15 +480,16 @@ def find_table_bounding_box(box_list, table_top_hint, table_bottom_hint):
         miny = float("-inf")
         maxy = float("+inf")
 
-        glyphs = [glyph for glyph in box_list if glyph.text is not None]
+        words = make_words(box_list)
+        words = [word for word in words if word.text is not None]
 
         if table_top_hint:
-            top_box = [box for box in glyphs if table_top_hint in box.text]
+            top_box = [box for box in words if table_top_hint in box.text]
             if top_box:
                 miny = top_box[0].top
 
         if table_bottom_hint:
-            bottomBox = [box for box in glyphs
+            bottomBox = [box for box in words
                          if table_bottom_hint in box.text]
             if bottomBox:
                 maxy = bottomBox[0].bottom
