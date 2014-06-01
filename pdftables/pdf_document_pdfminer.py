@@ -6,10 +6,12 @@ PDFDocument backend based on pdfminer
 import collections
 
 import pdfminer.pdfparser
+import pdfminer.pdfdocument
 import pdfminer.pdfinterp
 import pdfminer.pdfdevice
 import pdfminer.layout
 import pdfminer.converter
+import pdfminer.pdfpage
 
 from .pdf_document import (
     PDFDocument as BasePDFDocument,
@@ -28,13 +30,9 @@ class PDFDocument(BasePDFDocument):
     @staticmethod
     def _initialise(file_handle):
 
-        (doc, parser) = (pdfminer.pdfparser.PDFDocument(),
-                         pdfminer.pdfparser.PDFParser(file_handle))
+        parser = pdfminer.pdfparser.PDFParser(file_handle)
+        doc = pdfminer.pdfdocument.PDFDocument(parser)
 
-        parser.set_document(doc)
-        doc.set_parser(parser)
-
-        doc.initialize('')
         if not doc.is_extractable:
             raise ValueError(
                 "pdfminer.pdfparser.PDFDocument is_extractable != True")
@@ -74,7 +72,7 @@ class PDFDocument(BasePDFDocument):
         return self._pages
 
     def _construct_pages(self):
-        self._pages = [PDFPage(self, page) for page in self._doc.get_pages()]
+        self._pages = [PDFPage(self, page) for page in pdfminer.pdfpage.PDFPage.create_pages(self._doc)]
 
     def get_page(self, page_number):
         """
@@ -105,7 +103,7 @@ class PDFPage(BasePDFPage):
     """
 
     def __init__(self, parent_pdf_document, page):
-        assert isinstance(page, pdfminer.pdfparser.PDFPage), page.__class__
+        assert isinstance(page, pdfminer.pdfpage.PDFPage), page.__class__
 
         self.pdf_document = parent_pdf_document
         self._page = page
